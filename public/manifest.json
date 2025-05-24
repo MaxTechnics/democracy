@@ -1,0 +1,27 @@
+{
+    "theme_color": "#0a0a0a",
+    "background_color": "#0a0a0a",
+    "icons": [
+        {
+            "purpose": "maskable",
+            "sizes": "512x512",
+            "src": "icon512_maskable.png",
+            "type": "image/png"
+        },
+        {
+            "purpose": "any",
+            "sizes": "512x512",
+            "src": "icon512_rounded.png",
+            "type": "image/png"
+        }
+    ],
+    "orientation": "portrait",
+    "display": "standalone",
+    "dir": "auto",
+    "lang": "en-US",
+    "name": "Democracy",
+    "short_name": "democracy",
+    "start_url": "democracy.infonet.wtf",
+    "id": "democracy.infonet.wtf",
+    "description": "Interactivity on Backstage"
+}
