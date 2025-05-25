@@ -125,6 +125,7 @@ voterChannel
 
 		startVote(payload.vote_action);
 
+		vibrate();
 		const serverResponse = await voterChannel.send({ type: 'broadcast', event: 'acknowledge' });
 		console.log('vote_trigger ack serverResponse', serverResponse)
 	})
