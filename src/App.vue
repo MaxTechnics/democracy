@@ -181,9 +181,12 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-.slowfade-enter-active,
+.slowfade-enter-active {
+	transition: all 2.5s cubic-bezier(0.4, 0.14, 0.3, 1);
+}
+
 .slowfade-leave-active {
-  transition: all 2.5s cubic-bezier(0.4, 0.14, 0.3, 1);
+  transition: all 4.5s cubic-bezier(0.4, 0.14, 0.3, 1);
   /* Carbon motion expressive */
 }
 
