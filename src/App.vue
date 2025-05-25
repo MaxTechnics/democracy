@@ -139,7 +139,7 @@ voterChannel
 	})
 	.subscribe();
 
-const d = () => new Promise(r => setTimeout(r, 500));
+const d = () => new Promise(r => setTimeout(r, 250));
 
 const _submitVote = async (id: string) => {
 	if (voteState.vote_submissions === 0) throw 'No votes remaining';
