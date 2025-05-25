@@ -191,6 +191,10 @@ onBeforeUnmount(() => {
   opacity: 0;
 }
 
+h1 {
+	font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
 main {
   height: 100%;
   display: flex;
