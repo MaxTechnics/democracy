@@ -28,3 +28,7 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# Not me having to use git-filter-repo to remove credentials i accidentally committed..........
+# Not me at all!
+.env
