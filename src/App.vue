@@ -11,7 +11,7 @@
 			</button>
 		</Fragment>
 
-		<div class="wee_little_debug_box">
+		<div v-if="showdebug" class="wee_little_debug_box">
 			<span>Wakelock supported: {{ isSupported }}</span>
 			<span>Wakelock active: {{ isActive }}</span>
 			<span>Vibin' supported: {{ vibecheck }}</span>
@@ -36,12 +36,13 @@ import LucideIcon from './components/LucideIcon.vue';
 import RealtimeLatency from './components/RealtimeLatency.vue';
 import { supabase } from '@/lib/supabase';
 import { Toaster, toast } from 'vue-sonner';
-import { useWakeLock, useVibrate } from '@vueuse/core';
+import { useWakeLock, useVibrate, useUrlSearchParams } from '@vueuse/core';
 import Fragment from './components/Fragment.vue';
 import type * as lucideicon from 'lucide-vue-next';
 
 const { isSupported, isActive, forceRequest, request, release } = useWakeLock()
 const { vibrate, stop, isSupported: vibecheck } = useVibrate({ pattern: [300, 100, 300] })
+const urlparams = useUrlSearchParams('history');
 
 type VoteChoice = {
 	name: string;
@@ -58,6 +59,9 @@ interface VoteMessage {
 
 const voteActive = ref(false);
 const latest_msg = ref('N/A');
+const showdebug = ref(false);
+
+if (urlparams.debug === 'true') showdebug.value = true;
 
 const tesstdata: VoteMessage = {
 	id: 'test_vote',
