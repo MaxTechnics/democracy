@@ -20,6 +20,7 @@
 			<span>Latest msg: {{ latest_msg }}</span>
 			<RealtimeLatency :supa_client="supabase" />
 			<span>Active election: {{ voteState.election?.id || 'None' }}</span>
+			<span>Session ID: {{ active_session_id || 'None' }}</span>
 			<span>Remaining votes: {{ voteState.vote_submissions }}</span>
 		</div>
 	</main>
@@ -61,6 +62,7 @@ interface VoteMessage {
 
 const voteActive = ref(false);
 const latest_msg = ref('N/A');
+const active_session_id = ref<string | null>(null);
 const showdebug = ref(false);
 
 if (urlparams.debug === 'true') showdebug.value = true;
@@ -103,6 +105,20 @@ const showBg = computed(() => {
 	return voteState.election !== null;
 });
 
+// Session storage methods
+const getVoteKey = (sessionId: string) => `votes_${sessionId}`;
+
+const getSessionVotes = (sessionId: string): string[] => {
+	const stored = localStorage.getItem(getVoteKey(sessionId));
+	return stored ? JSON.parse(stored) : [];
+}
+
+const addVote = (sessionId: string, choiceId: string) => {
+	const votes = getSessionVotes(sessionId);
+	votes.push(choiceId);
+	localStorage.setItem(getVoteKey(sessionId), JSON.stringify(votes));
+}
+
 const startVote = (election: VoteMessage) => {
 	voteState.election = election;
 	voteState.vote_submissions = election.votes;
@@ -112,6 +128,7 @@ const endVote = () => {
 	voteState.election = null;
 	voteState.vote_loading = false;
 	voteState.vote_submissions = 0;
+	active_session_id.value = null;
 }
 
 const test = () => {
@@ -127,13 +144,30 @@ const voterChannel = supabase.channel('backstage', {
 voterChannel
 	.on('broadcast', { event: 'vote_trigger' }, async ({ payload }) => {
 		console.log('Got message', payload)
-		latest_msg.value = `${payload.vote_action.id}`
-
+		latest_msg.value = `${payload.vote_action.id}`;
+		active_session_id.value = payload.session_id;
+		
 		startVote(payload.vote_action);
 
 		vibrate();
 		const serverResponse = await voterChannel.send({ type: 'broadcast', event: 'acknowledge' });
 		console.log('vote_trigger ack serverResponse', serverResponse)
+	})
+	.on('broadcast', { event: 'vote_ongoing' }, async ({ payload }) => {
+		console.log('Got message (vote ongoing)', payload)
+		latest_msg.value = `${payload.vote_action.id} ongoing`
+		active_session_id.value = payload.session_id;
+		voteState.election = payload.vote_action;
+
+		const castVotes = getSessionVotes(payload.session_id);
+		const remainingVotes = payload.vote_action.votes - castVotes.length;
+		
+		if (remainingVotes > 0) {
+			startVote({ ...payload.vote_action, votes: remainingVotes });
+		}
+
+		const serverResponse = await voterChannel.send({ type: 'broadcast', event: 'acknowledge' });
+		console.log('vote_ongoing ack serverResponse', serverResponse)
 	})
 	.on('broadcast', { event: 'vote_end' }, async () => {
 		console.log('Got message')
@@ -167,6 +201,11 @@ const handleVote = (id: string) => {
 	toast.promise(_submitVote(id), {
 		loading: 'Submitting vote',
 		success: () => {
+			if (active_session_id.value === null) {
+				console.error('No active session ID found when submitting vote!');
+				return 'Vote cast! (Session ID error)';
+			}
+			addVote(active_session_id.value, id);
 			if (voteState.vote_submissions !== -1) voteState.vote_submissions--;
 			return `Vote cast! ${[-1, 0].includes(voteState.vote_submissions) ? 'Thank you!' : `You have ${voteState.vote_submissions} vote(s) left.`}`
 		},
