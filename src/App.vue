@@ -6,9 +6,11 @@
 
 		<Fragment v-else>
 			<h1>{{ voteState.vote_submissions === 0 ? 'Thank you for voting' : voteState.election.title }}</h1>
-			<button v-if="voteState.vote_submissions !== 0" v-for="choice in voteState.election.choice" :key="choice.id" :disabled="voteState.vote_loading" @click="handleVote(choice.id)">
-				<LucideIcon :name="choice.icon" :size="24" :strokeWidth="2" /> {{ choice.name }}
-			</button>
+			<div class="vote_options">
+				<button v-if="voteState.vote_submissions !== 0" v-for="choice in voteState.election.choice" :key="choice.id" :disabled="voteState.vote_loading" @click="handleVote(choice.id)">
+					<LucideIcon :name="choice.icon" :size="24" :strokeWidth="2" /> {{ choice.name }}
+				</button>
+			</div>
 		</Fragment>
 
 		<div v-if="showdebug" class="wee_little_debug_box">
@@ -234,6 +236,14 @@ main {
   }
 }
 
+.vote_options {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; // makes all buttons stretch to the widest one's width
+  gap: 1rem;
+  width: fit-content;
+}
+
 button {
 	border: 2px white solid;
 	color: white;
@@ -241,7 +251,7 @@ button {
 	font-size: 1.25rem;
 	border-radius: 0.5rem;
 	background-color: transparent;
-	width: 200px;
+	min-width: 200px;
 	transition: all 0.3 ease;
 	cursor: pointer;
 	display: flex;
