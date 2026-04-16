@@ -146,7 +146,7 @@ voterChannel
 		console.log('Got message', payload)
 		latest_msg.value = `${payload.vote_action.id}`;
 		active_session_id.value = payload.session_id;
-		
+
 		startVote(payload.vote_action);
 
 		vibrate();
@@ -161,8 +161,8 @@ voterChannel
 
 		const castVotes = getSessionVotes(payload.session_id);
 		const remainingVotes = payload.vote_action.votes - castVotes.length;
-		
-		if (remainingVotes > 0) {
+
+		if (remainingVotes > 0 || remainingVotes === -1) {
 			startVote({ ...payload.vote_action, votes: remainingVotes });
 		}
 
@@ -296,7 +296,7 @@ button {
 	display: flex;
 	gap: 0.25rem;
 	align-items: center;
-  
+
   &:hover,
   &:active {
     background-color: white;
