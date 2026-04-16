@@ -163,9 +163,8 @@ voterChannel
 		const remainingVotes = payload.vote_action.votes - castVotes.length;
 
 		if (payload.vote_action.votes === -1) {
-			startVote({ ...payload.vote_action, castVotes.length);
-		}
-		else if (remainingVotes > 0 || remainingVotes === -1) {
+			startVote({ ...payload.vote_action, votes: -1 });
+		} else if (remainingVotes > 0 || remainingVotes === -1) {
 			startVote({ ...payload.vote_action, votes: remainingVotes });
 		}
 
